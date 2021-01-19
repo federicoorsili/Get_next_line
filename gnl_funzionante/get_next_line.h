@@ -13,12 +13,17 @@
 #ifndef FT_GETNEXTLINE
 # define FT_GETNEXTLINE
 
-# define BUFFER_SIZE 0
+# include <unistd.h>
+# include <stdlib.h>
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 4000
+# endif
 
 int		get_next_line(int fd, char **line);
-char	*ft_strcpy(char *dest, char *src)
-void	ft_bzero(void *s, unsigned long long n)
-size_t	ft_strlen(const char *str)
-int		check_zero(char buf[4064][BUFFER_SIZE], int fd)
+char	*ft_strcpy(char *dest, char *src);
+void	ft_bzero(void *s, unsigned long long n);
+int		ft_strlen(const char *str);
+int		check_zero(char buf[4064][BUFFER_SIZE], int fd);
 
 #endif
