@@ -21,7 +21,7 @@ size_t	ft_strlen(const char *str);
 char		*ft_substr(char const *s, unsigned int start, size_t len);
 char				*ft_strdup(const char *s1);
 void	ft_bzero(void *s, unsigned long long n);
-int read_file(char **line, char **buf, int fd, int flag);
+int	engine_smal(int fd, char **buf, char *line);
 
 char	**malloc_buf(char **buf)
 {
@@ -34,61 +34,68 @@ char	**malloc_buf(char **buf)
 		return (0);
 	while(i < 4064)
 	{
-		if (!(buf[i] = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char))))
+		if (!(buf[i] = (char *)malloc((BUFFER_SIZE) * sizeof(char))))
 			return (0);
-		i++;
+		ft_bzero(buf[i], BUFFER_SIZE + 1);
+        i++;
 	}
 	return (buf);
 }
 
-int	check_buf(int fd, char **buf, char **line, int control)
+int	engine(int fd, char **buf, char *line)
 {
-	int i;
-	int k;
-	int sw;
-	char *tmp;
+    int k;
+    int i;
 
-	i = 0;
-	k = ft_strlen(*line);
-	while (buf[fd][i] != '\n' && buf[fd][i])
-	{
-		printf("giustalol\n");
-		(*line)[k] = buf[fd][i];
-		printf("%c\n%c\n", *line[k], buf[fd][i]);
-		k++;
-		i++;
-	}
-	sw = (buf[fd][i] == '\n' ? 1 : 0);
-	if (sw == 1 && (*line)[k - 1] == buf[fd][ft_strlen(buf[fd]) - 2])
-	{
-		line[k] = 0;
-		printf("giusta %s\n", (*line));
-		return (1);
-	}
-	else if (sw == 1 && (*line)[k - 1] != buf[fd][ft_strlen(buf[fd]) - 1])
-	{
-		if(!(tmp = (char *)malloc((ft_strlen(buf[fd]) + 1) * sizeof (char))))
-			return (-1);
-		tmp = ft_strdup(buf[fd]);
-		buf[fd] = ft_substr(tmp, ft_strlen(*line), (ft_strlen(buf[fd]) - ft_strlen(*line)));
-		printf("lunga %s\n", (*line));
-		return (1);
-	}
-	else if (sw == 0 && k > i)
-	{
-		printf("corta %s\n", (*line));
-		/*salva l'ccedenza*/
-		if (control == 0)
-			return (0);
-		else
-		{
-			ft_bzero(buf, BUFFER_SIZE);
-			read_file(line, buf, fd, 1);
-		}
-	}
-	if (sw == 0 && control < BUFFER_SIZE)
-		return (0);
-	return (1);
+    k = ft_strlen(line);
+    i = 0;
+    while (buf[fd][i] != '\n' && buf[fd][i])
+    {
+        line[k] = buf[fd][i];
+        i++;
+        k++;
+    }
+    line[k] = 0;
+    printf("|%s| \n", line);
+    if (i == ft_strlen(buf[fd]) && buf[fd][i] ==  '\n')
+    {
+        free(buf[fd]);
+        return (1);
+    }
+    if (i < ft_strlen(buf[fd]) && buf[fd][i] ==  '\n')
+        if ((buf[fd] = ft_substr(buf[fd], i + 1, (ft_strlen(buf[fd]) - (i + 1)))) != 0)
+            return (1);
+    if (i == ft_strlen(buf[fd]) && buf[fd][i] ==  0)
+        return(engine_smal(fd, buf, line));
+    return (1);
+}
+
+int	check_buf(int fd, char **buf, char *line)
+{
+    int k;
+    int read_res;
+
+    k = 0;
+    if (buf[fd][k] != 0)
+    {
+        while (buf[fd][k] != '\n' && buf[fd][k] != 0)
+        {
+            line[k] = buf[fd][k];
+            k++;
+        }
+        if (buf[fd][k] == '\n')
+        {
+            line[k] = 0;
+            buf[fd] = ft_substr(buf[fd], k + 1, (ft_strlen(buf[fd]) - (k + 1)));
+            return (1);
+        }
+        else if (buf[fd][k] == 0)
+            ft_bzero(buf[fd], BUFFER_SIZE + 1);
+    }
+    if ((read_res = read(fd, buf[fd], BUFFER_SIZE)) < 1)
+        return (read_res);
+    read_res = engine(fd, buf, line);
+        return (read_res);
 }
 
 int get_next_line(int fd, char **line)
@@ -97,20 +104,13 @@ int get_next_line(int fd, char **line)
 	int                 exit;
 
 	if (!buf)
-		{
-			buf =malloc_buf(buf);
-			if(!buf)
-				return (-1);
-		}
-	if (!fd)
+		if ((buf = malloc_buf(buf)) == 0)
+            return (-1);
+	if (!fd || !line)
 		return (-1);
-	printf("check 1v\n");
-	exit = read_file(line, buf, fd, 0);
+	exit = check_buf(fd, buf, (*line));
 	if (exit != 1)
 		return (exit);
-	//exit = check_buf(fd, buf, line , 1);
-	//if (exit != 1)
-	//	return (exit);
 	return (1);
 }
 
@@ -119,19 +119,22 @@ int main()
   int fd;
   int i = 0;
   char  **line;
-  
+  int res = 1;
 
-  if (!(line = (char **)malloc(100000 * sizeof(char *))))
+  if (!(line = (char **)malloc(1000 * sizeof(char *))))
       return (-1);
-  while (i < 300)
-  {
-  	if (!(line[i] = (char *)malloc(100 * sizeof(char ))))
+    if (!(line[0] = (char *)malloc(1000 * sizeof(char ))))
       return (-1);
-  	i++;
-  }
   fd = open("prova", O_RDONLY);
   i = 0;
-  while(get_next_line(fd, line) == 1)
+  while(res == 1)
+  {
+      res = get_next_line(fd, line);
+      //printf("%d\n", res);
+      //printf("|%s| \n", *line);
+      if (!(line[0] = (char *)malloc(1000 * sizeof(char ))))
+      return (-1);
+      //printf("3\n");
   	i++;
+  }
 }
-

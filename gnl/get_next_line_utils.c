@@ -15,9 +15,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
- 
 
-int	check_buf(int fd, char **buf, char *line, int control);
+int	check_buf(int fd, char **buf, char *line);
+int	engine(int fd, char **buf, char *line);
 
 size_t	ft_strlen(const char *str)
 {
@@ -27,29 +27,6 @@ size_t	ft_strlen(const char *str)
 	while (str[i])
 		i++;
 	return (i);
-}
-
-int read_file(char *line, char **buf, int fd, int flag)
-{
-	int k;
-	int control;
-
-	k = 0;
-	control = 0;
-	// bisogna controllare se il buffer é vuoto, se non lo é, copiare prima il buffer e poi cominciare a leggere 
-	if (flag == 1)
-	{
-		while (buf[fd][k])
-		{
-			line[k] = buf[fd][k];
-			k++;
-		}
-	}
-	control = read(fd, buf[fd], BUFFER_SIZE);
-	if (control < 0)
-		return (-1);
-	check_buf(fd, buf, line, control);
-	return (1);
 }
 
 void	ft_bzero(void *s, unsigned long long n)
@@ -117,4 +94,21 @@ char		*ft_substr(char const *s, unsigned int start, size_t len)
 	ft_strlcpy(substr, s + start, len + 1);
 	return (substr);
 }
+
+int	engine_smal(int fd, char **buf, char *line)
+{
+    int res;
+    int k;
+    int i;
+
+    k = ft_strlen(line);
+    i = 0;
+    if (buf[fd][0] != 0)
+        ft_bzero(buf[fd], BUFFER_SIZE);
+    if ((res = read(fd, buf[fd], BUFFER_SIZE)) == 0)
+        return (1);
+    return(engine(fd, buf, line));
+}
+
+
 
