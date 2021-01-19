@@ -1,0 +1,2 @@
+language = "bash"
+run = "gcc -Werror -Wextra -Wall -D BUFFER_SIZE=3 G"
