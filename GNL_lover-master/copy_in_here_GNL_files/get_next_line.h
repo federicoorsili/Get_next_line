@@ -24,6 +24,6 @@ int		get_next_line(int fd, char **line);
 char	*ft_strcpy(char *dest, char *src);
 void	ft_bzero(void *s, unsigned long long n);
 int		ft_strlen(const char *str);
-int		check_zero(char buf[4096][BUFFER_SIZE], int fd);
+int		check_zero(char buf[4064][BUFFER_SIZE], int fd);
 
 #endif

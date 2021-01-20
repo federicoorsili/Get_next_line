@@ -8,14 +8,14 @@ char	*alloc(char *str, int mod)
 		if(!(tmp = malloc((ft_strlen(str) + BUFFER_SIZE + 1 ) * sizeof(char))))
 			return (0);
 	if (mod == 1)
-		if (!(tmp = malloc((ft_strlen(str)) * sizeof(char))))
+		if (!(tmp = malloc((ft_strlen(str) + 1) * sizeof(char))))
 			return (0);
 	tmp = ft_strcpy(tmp, str);
 	free(str);
 	return (tmp);
 }
 
-int		empty_buf(char buf[4096][BUFFER_SIZE], char **line, int fd)
+int		empty_buf(char buf[4064][BUFFER_SIZE], char **line, int fd)
 {
 	int k;
 	int j;
@@ -39,13 +39,12 @@ int		empty_buf(char buf[4096][BUFFER_SIZE], char **line, int fd)
 	if (buf[fd][k] == '\n')
 	{
 		buf[fd][k] = 0;
-		*line = alloc(*line, 1);
 		return (1);
 	}
 	return (0);
 }
 
-int		check_buf(char buf[4096][BUFFER_SIZE], char **line, int fd)
+int		check_buf(char buf[4064][BUFFER_SIZE], char **line, int fd)
 {
 	int res_read;
 
@@ -57,11 +56,7 @@ int		check_buf(char buf[4096][BUFFER_SIZE], char **line, int fd)
 	*line = alloc(*line, 0);
 	res_read = (read(fd, buf[fd], BUFFER_SIZE));
 	if (res_read <= 0)
-	{
-		if (res_read == 0)
-			*line = alloc(*line, 1);
 		return (res_read);
-	}
 	//if (res_read < BUFFER_SIZE && ft_strlen(*line) > BUFFER_SIZE)
 		//return(0);
 	return (2);
@@ -69,11 +64,11 @@ int		check_buf(char buf[4096][BUFFER_SIZE], char **line, int fd)
 
 int		get_next_line(int fd, char **line)
 { 
-	static char		buf[4096][BUFFER_SIZE];
+	static char		buf[4064][BUFFER_SIZE];
 	int				exit;
 
 	exit = 2;
-	if (fd < 0 || fd > 4096 || !line || BUFFER_SIZE <= 0)
+	if (fd < 0 || !line || BUFFER_SIZE <= 0)
 		return (-1);
 	if (!(*line = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char))))
 		return (-1);

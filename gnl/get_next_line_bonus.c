@@ -1,4 +1,4 @@
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*alloc(char *str, int mod)
 {
@@ -73,7 +73,7 @@ int		get_next_line(int fd, char **line)
 	int				exit;
 
 	exit = 2;
-	if (fd < 0 || fd > 4096 || !line || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > 255 || !line || BUFFER_SIZE <= 0)
 		return (-1);
 	if (!(*line = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char))))
 		return (-1);

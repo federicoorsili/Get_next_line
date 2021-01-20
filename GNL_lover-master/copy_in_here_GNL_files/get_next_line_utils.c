@@ -36,7 +36,7 @@ int		ft_strlen(const char *str)
 	return (i);
 }
 
-int		check_zero(char buf[4096][BUFFER_SIZE], int fd)
+int		check_zero(char buf[4064][BUFFER_SIZE], int fd)
 {
 	int i;
 	int count;
